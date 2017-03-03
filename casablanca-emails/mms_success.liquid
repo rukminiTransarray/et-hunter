@@ -1,0 +1,35 @@
+    {% comment %}
+    Platform MMS Template Attributes:
+    - Name: "[YOUR_BRAND] Photoregister Success"
+    - From Number: "+18654072219" on staging and "71403" on production
+    - Event: "None"
+    {% endcomment %}
+    {% assign brand_name = "Casablanca" %}
+    {% assign base_url = "https://casablanca.registria.com/reg" %}
+    {% unless photoregister_activity.user == nil %}
+        {% assign user = photoregister_activity.user %}
+    {% endunless %}
+    {% assign registration = user.registrations.last %}
+    {% assign reg_id = "" %}
+    {% assign pr_action = photoregister_activity.photoregister_ruleset.action %}
+    {% if pr_action == "Register" or pr_action == "register" %}
+        {% if registration != nil and photoregister_activity.photoregister_code.product != nil %}
+            {% capture reg_id %}/{{ registration.id }}{% endcapture %}
+        {% endif %}
+    {% endif %}
+    {% assign token = "" %}
+    {% unless pr_action == "Information" or pr_action == "information" %}
+        {% if user.single_access_token != nil and user.single_access_token != "" %}
+          {% capture token %}t={{ user.single_access_token }}{% endcapture %}
+        {% endif %}
+    {% endunless %}
+    {% if photoregister_activity.user == nil %}
+        {% capture link_url %}{{ base_url }}{{ reg_id }}?phone={{ photoregister_activity.from }}{% endcapture %}
+    {% elsif user.first_name == nil or user.first_name == "" %}
+        {% capture link_url %}{{ base_url }}{{ reg_id }}?{{ token }}&phone={{ photoregister_activity.from }}{% endcapture %}
+    {% else %}
+        {% capture link_url %}{{ base_url }}{{ reg_id }}?{{ token }}{% endcapture %}
+    {% endif %}
+    {{ brand_name }} Photoregister: Tap link to complete registration {{ link_url }} For help, text HELP. To cancel, text STOP. 1 msg/registration, msg & data rates may apply.
+
+
